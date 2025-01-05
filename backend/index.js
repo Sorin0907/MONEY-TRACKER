@@ -15,17 +15,18 @@ import { buildContext } from "graphql-passport";
 import { passportConfig } from "./passport/passport.config.js";
 
 dotenv.config();
+passportConfig();
 
 const app = express();
 const httpServer = http.createServer(app);
 
-const MongoStore = connectMongo(session);
-const sessionStore = new MongoStore({
-  url: process.env.MONGO_URI,
-  collection: "sessions",
+// const MongoStore = connectMongo(session);
+const sessionStore = connectMongo.create({
+  mongoUrl: process.env.MONGO_URI,
+  collectionName: "sessions",
 });
 
-Store.on("error", console.error);
+sessionStore.on("error", console.error);
 
 app.use(
   session({
@@ -52,7 +53,7 @@ const server = new ApolloServer({
 await server.start();
 
 app.use(
-  "/",
+  "/graphql",
   cors({
     origin: "http://localhost:3000",
     credentials: true,
@@ -66,4 +67,4 @@ app.use(
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 await connectDB();
 
-console.log(`🚀 Server ready at http://localhost:4000`);
+console.log(`🚀 Server ready at http://localhost:4000/graphql`);

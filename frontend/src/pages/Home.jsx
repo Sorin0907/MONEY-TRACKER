@@ -12,33 +12,51 @@ import { useEffect, useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+/**
+ * Home Component
+ * 
+ * This component serves as the main dashboard for the application. It includes functionality for:
+ * - Fetching and displaying transaction statistics using a doughnut chart.
+ * - Allowing users to add transactions through a form.
+ * - Providing a logout mechanism.
+ * 
+ * Dependencies:
+ * - React and React hooks (useState, useEffect)
+ * - Apollo Client (useQuery, useMutation)
+ * - Chart.js and react-chartjs-2 for chart rendering
+ * - React icons (MdLogout)
+ */
 const Home = () => {
   const [logoutUser, { loading, client }] = useMutation(LOGOUT, {
     refetchQueries: ["GetAuthUser"],
   });
 
-  const { data: stats, loading: statsLoading } = useQuery(GET_TRANSACTIONS_STATS);
+  const { data: stats, loading: statsLoading } = useQuery(
+    GET_TRANSACTIONS_STATS
+  );
   console.log(stats);
 
-	const [chartData, setChartData] = useState({
-		labels: [],
-		datasets: [
-			{
-				label: "$",
-				data: [],
-				backgroundColor: [],
-				borderColor: [],
-				borderWidth: 1,
-				borderRadius: 30,
-				spacing: 10,
-				cutout: 130,
-			},
-		],
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "$",
+        data: [],
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1,
+        borderRadius: 30,
+        spacing: 10,
+        cutout: 130,
+      },
+    ],
   });
 
   useEffect(() => {
     if (stats?.GetTransactionsStats) {
-      const categories = stats?.GetTransactionsStats.map((stat) => stat.category);
+      const categories = stats?.GetTransactionsStats.map(
+        (stat) => stat.category
+      );
       const amounts = stats?.GetTransactionsStats.map((stat) => stat.amount);
 
       const colors = [];
@@ -59,7 +77,7 @@ const Home = () => {
         }
       });
 
-      setChartData(prev => ({
+      setChartData((prev) => ({
         labels: categories,
         datasets: [
           {
@@ -67,47 +85,56 @@ const Home = () => {
             data: amounts,
             backgroundColor: colors,
             borderColor: borderColors,
-          }
-        ]
+          },
+        ],
       }));
     }
   }, [stats]);
 
-	const handleLogout = async () => {
-		try {
+  const handleLogout = async () => {
+    try {
       await logoutUser();
       client.resetStore();
     } catch (error) {
       console.error(error);
     }
-	};
+  };
 
-	return (
-		<>
-			<div className='flex flex-col gap-6 items-center max-w-7xl mx-auto z-20 relative justify-center'>
-				<div className='flex items-center'>
-					<p className='md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text'>
-						Spend wisely, track wisely
-					</p>
-					<img
-						src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
-						className='w-11 h-11 rounded-full border cursor-pointer'
-						alt='Avatar'
-					/>
-					{!loading && <MdLogout className='mx-2 w-5 h-5 cursor-pointer' onClick={handleLogout} />}
-					{/* loading spinner */}
-					{loading && <div className='w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin'></div>}
-				</div>
-				<div className='flex flex-wrap w-full justify-center items-center gap-6'>
-					<div className='h-[330px] w-[330px] md:h-[360px] md:w-[360px]  '>
-						<Doughnut data={chartData} />
-					</div>
-
-					<TransactionForm />
-				</div>
-				<Cards />
-			</div>
-		</>
-	);
+  return (
+    <>
+      <div className="flex flex-col gap-6 items-center max-w-7xl mx-auto z-20 relative justify-center">
+        <div className="flex items-center">
+          <p className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">
+            Spend wisely, track wisely
+          </p>
+          <img
+            src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
+            className="w-11 h-11 rounded-full border cursor-pointer"
+            alt="Avatar"
+          />
+          {!loading && (
+            <MdLogout
+              className="mx-2 w-5 h-5 cursor-pointer"
+              onClick={handleLogout}
+            />
+          )}
+          {/* loading spinner */}
+          {loading && (
+            <div className="w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin"></div>
+          )}
+        </div>
+        <div className="flex flex-wrap w-full justify-center items-center gap-6">
+          {stats?.GetTransactionsStats &&
+            !statsLoading(
+              <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]  ">
+                <Doughnut data={chartData} />
+              </div>
+            )}
+          <TransactionForm />
+        </div>
+        <Cards />
+      </div>
+    </>
+  );
 };
 export default Home;

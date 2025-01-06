@@ -5,34 +5,78 @@ import Cards from "../components/UI/Cards";
 import TransactionForm from "../components/UI/TransactionForm";
 
 import { MdLogout } from "react-icons/md";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { LOGOUT } from "../graphql/mutations/logout.mutation";
+import { GET_TRANSACTIONS_STATS } from "../graphql/queries/get-transactions-stats.query";
+import { useEffect, useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Home = () => {
-  const [logoutUser, { loading }] = useMutation(LOGOUT, {
+  const [logoutUser, { loading, client }] = useMutation(LOGOUT, {
     refetchQueries: ["GetAuthUser"],
   });
-	const chartData = {
-		labels: ["Saving", "Expense", "Investment"],
+
+  const { data: stats, loading: statsLoading } = useQuery(GET_TRANSACTIONS_STATS);
+  console.log(stats);
+
+	const [chartData, setChartData] = useState({
+		labels: [],
 		datasets: [
 			{
-				label: "%",
-				data: [13, 8, 3],
-				backgroundColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235)"],
-				borderColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235, 1)"],
+				label: "$",
+				data: [],
+				backgroundColor: [],
+				borderColor: [],
 				borderWidth: 1,
 				borderRadius: 30,
 				spacing: 10,
 				cutout: 130,
 			},
 		],
-	};
+  });
+
+  useEffect(() => {
+    if (stats?.GetTransactionsStats) {
+      const categories = stats?.GetTransactionsStats.map((stat) => stat.category);
+      const amounts = stats?.GetTransactionsStats.map((stat) => stat.amount);
+
+      const colors = [];
+      const borderColors = [];
+
+      categories.forEach((category) => {
+        if (category === "saving") {
+          colors.push("#10B981");
+          borderColors.push("#10B981");
+        }
+        if (category === "expense") {
+          colors.push("#F59E0B");
+          borderColors.push("#F59E0B");
+        }
+        if (category === "investment") {
+          colors.push("#EF4444");
+          borderColors.push("#EF4444");
+        }
+      });
+
+      setChartData(prev => ({
+        labels: categories,
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: amounts,
+            backgroundColor: colors,
+            borderColor: borderColors,
+          }
+        ]
+      }));
+    }
+  }, [stats]);
 
 	const handleLogout = async () => {
 		try {
       await logoutUser();
+      client.resetStore();
     } catch (error) {
       console.error(error);
     }

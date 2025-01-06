@@ -22,6 +22,22 @@ const transactionResolver = {
         console.error(error);
       }
     },
+    GetTransactionsStats: async (_, __, context) => {
+      if (!context.getUser()) {
+        throw new Error("Unauthorized");
+      }
+      const userId = await context.getUser().id;
+      const transactions = await Transaction.find({ userId });
+      const categoryMap = {};
+
+      transactions.forEach((transaction) => {
+        if (!categoryMap[transaction.category]) {
+          categoryMap[transaction.category] = 0;
+        }
+        categoryMap[transaction.category] += transaction.amount;
+      })
+      return Object.entries(categoryMap).map(([category, amount]) => ({ category, amount }));
+    },
   },
   Mutation: {
     CreateTransaction: async (_, { input }, context) => {

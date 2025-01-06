@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node backend/index.js",
-    "dev": "nodemon backend/index.js"
+    "start": "NODE_ENP=production node backend/index.js",
+    "dev": "NODE_ENP=production nodemon backend/index.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "type": "module",
   "keywords": [],
@@ -23,7 +24,8 @@
     "graphql": "^16.10.0",
     "graphql-passport": "^0.6.8",
     "mongoose": "^8.9.2",
-    "passport": "^0.7.0"
+    "passport": "^0.7.0",
+    "ttag": "^1.8.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

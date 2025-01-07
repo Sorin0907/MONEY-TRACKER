@@ -14,12 +14,12 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 /**
  * Home Component
- * 
+ *
  * This component serves as the main dashboard for the application. It includes functionality for:
  * - Fetching and displaying transaction statistics using a doughnut chart.
  * - Allowing users to add transactions through a form.
  * - Providing a logout mechanism.
- * 
+ *
  * Dependencies:
  * - React and React hooks (useState, useEffect)
  * - Apollo Client (useQuery, useMutation)
@@ -34,7 +34,6 @@ const Home = () => {
   const { data: stats, loading: statsLoading } = useQuery(
     GET_TRANSACTIONS_STATS
   );
-  console.log(stats);
 
   const [chartData, setChartData] = useState({
     labels: [],
@@ -64,8 +63,8 @@ const Home = () => {
 
       categories.forEach((category) => {
         if (category === "saving") {
-          colors.push("#10B981");
-          borderColors.push("#10B981");
+          colors.push("#00693E");
+          borderColors.push("#004225");
         }
         if (category === "expense") {
           colors.push("#F59E0B");
@@ -124,15 +123,16 @@ const Home = () => {
           )}
         </div>
         <div className="flex flex-wrap w-full justify-center items-center gap-6">
-          {stats?.GetTransactionsStats &&
-            !statsLoading(
-              <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]  ">
-                <Doughnut data={chartData} />
-              </div>
-            )}
+          {Boolean(stats?.GetTransactionsStats.length) && !statsLoading && (
+            <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]  ">
+              <Doughnut data={chartData} />
+            </div>
+          )}
           <TransactionForm />
         </div>
-        <Cards />
+        {Boolean(stats?.GetTransactionsStats.length) && !statsLoading && (
+          <Cards />
+        )}
       </div>
     </>
   );

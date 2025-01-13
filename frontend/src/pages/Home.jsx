@@ -1,12 +1,10 @@
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-import Cards from "../components/UI/Cards";
 import TransactionForm from "../components/UI/TransactionForm";
+import Cards from "../components/UI/Cards";
 
-import { MdLogout } from "react-icons/md";
-import { useMutation, useQuery } from "@apollo/client";
-import { LOGOUT } from "../graphql/mutations/logout.mutation";
+import { useQuery } from "@apollo/client";
 import { GET_TRANSACTIONS_STATS } from "../graphql/queries/get-transactions-stats.query";
 import { useEffect, useState } from "react";
 
@@ -18,7 +16,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
  * This component serves as the main dashboard for the application. It includes functionality for:
  * - Fetching and displaying transaction statistics using a doughnut chart.
  * - Allowing users to add transactions through a form.
- * - Providing a logout mechanism.
  *
  * Dependencies:
  * - React and React hooks (useState, useEffect)
@@ -27,9 +24,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
  * - React icons (MdLogout)
  */
 const Home = () => {
-  const [logoutUser, { loading, client }] = useMutation(LOGOUT, {
-    refetchQueries: ["GetAuthUser"],
-  });
+  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" or "history"
 
   const { data: stats, loading: statsLoading } = useQuery(
     GET_TRANSACTIONS_STATS
@@ -63,16 +58,16 @@ const Home = () => {
 
       categories.forEach((category) => {
         if (category === "saving") {
-          colors.push("#00693E");
-          borderColors.push("#004225");
+          colors.push("#22c55e"); // Modern green
+          borderColors.push("#166534"); // Darker green
         }
         if (category === "expense") {
-          colors.push("#F59E0B");
-          borderColors.push("#F59E0B");
+          colors.push("#fbbf24"); // Amber
+          borderColors.push("#b45309"); // Darker amber
         }
         if (category === "investment") {
-          colors.push("#EF4444");
-          borderColors.push("#EF4444");
+          colors.push("#ef4444"); // Red
+          borderColors.push("#b91c1c"); // Darker red
         }
       });
 
@@ -90,51 +85,68 @@ const Home = () => {
     }
   }, [stats]);
 
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-      client.resetStore();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
-    <>
-      <div className="flex flex-col gap-6 items-center max-w-7xl mx-auto z-20 relative justify-center">
-        <div className="flex items-center">
-          <p className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">
-            Spend wisely, track wisely
-          </p>
-          <img
-            src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
-            className="w-11 h-11 rounded-full border cursor-pointer"
-            alt="Avatar"
-          />
-          {!loading && (
-            <MdLogout
-              className="mx-2 w-5 h-5 cursor-pointer"
-              onClick={handleLogout}
-            />
-          )}
-          {/* loading spinner */}
-          {loading && (
-            <div className="w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin"></div>
-          )}
-        </div>
-        <div className="flex flex-wrap w-full justify-center items-center gap-6">
-          {Boolean(stats?.GetTransactionsStats.length) && !statsLoading && (
-            <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]  ">
-              <Doughnut data={chartData} />
-            </div>
-          )}
+    <div className="flex flex-col gap-8 items-center max-w-7xl mx-auto p-6 relative">
+      {/* Transaction Form */}
+      <div className="flex justify-center items-center w-full">
+        <div className="w-full md:w-2/3 lg:w-1/2 bg-gray-800 p-6 rounded-lg shadow-md">
           <TransactionForm />
         </div>
-        {Boolean(stats?.GetTransactionsStats.length) && !statsLoading && (
-          <Cards />
-        )}
       </div>
-    </>
+
+      {/* Tabbed Interface */}
+      <div className="w-full flex flex-col items-center">
+        {/* Tabs */}
+        <div className="flex gap-6 mb-6">
+          <button
+            className={`px-6 py-2 rounded-lg font-semibold ${
+              activeTab === "dashboard"
+                ? "bg-teal-500 text-gray-100"
+                : "bg-gray-700 text-gray-300"
+            } hover:bg-teal-400 transition`}
+            onClick={() => setActiveTab("dashboard")}
+          >
+            Dashboard
+          </button>
+          <button
+            className={`px-6 py-2 rounded-lg font-semibold ${
+              activeTab === "history"
+                ? "bg-teal-500 text-gray-100"
+                : "bg-gray-700 text-gray-300"
+            } hover:bg-teal-400 transition`}
+            onClick={() => setActiveTab("history")}
+          >
+            History
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="w-full flex justify-center">
+          {activeTab === "dashboard" && (
+            <div className="flex flex-wrap justify-center items-center gap-8 w-full">
+              {Boolean(stats?.GetTransactionsStats.length) && !statsLoading && (
+                <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px] bg-gray-800 rounded-xl shadow-lg p-4">
+                  <Doughnut data={chartData} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "history" && (
+            <div className="w-full">
+              {Boolean(stats?.GetTransactionsStats.length) && !statsLoading ? (
+                <Cards />
+              ) : (
+                <p className="text-gray-400 text-center">
+                  No transactions recorded yet.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
+
 export default Home;

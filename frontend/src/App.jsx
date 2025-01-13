@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast";
 
 
 function App() {
-  const {data, loading, error } = useQuery(GET_AUTH_USER);
+  const {data, loading } = useQuery(GET_AUTH_USER);
   if (loading) return <p>Loading...</p>;
 	return (
 		<>

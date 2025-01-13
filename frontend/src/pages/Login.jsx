@@ -41,55 +41,47 @@ const Login = () => {
 	};
 
 	return (
-		<div className='flex justify-center items-center h-screen'>
-			<div className='flex rounded-lg overflow-hidden z-50 bg-gray-300'>
-				<div className='w-full bg-gray-100 min-w-80 sm:min-w-96 flex items-center justify-center'>
-					<div className='max-w-md w-full p-6'>
-						<h1 className='text-3xl font-semibold mb-6 text-black text-center'>Login</h1>
-						<h1 className='text-sm font-semibold mb-6 text-gray-500 text-center'>
-							Welcome back! Log in to your account
-						</h1>
-						<form className='space-y-4' onSubmit={handleSubmit}>
-							<InputField
-								label='Username'
-								id='username'
-								name='username'
-								value={loginData.username}
-								onChange={handleChange}
-							/>
-
-							<InputField
-								label='Password'
-								id='password'
-								name='password'
-								type='password'
-								value={loginData.password}
-								onChange={handleChange}
-							/>
-							<div>
-								<button
-									type='submit'
-									className='w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black  focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300
-										disabled:opacity-50 disabled:cursor-not-allowed
-									'
-                  disabled={loading}
-								>
-									{loading ? "Loging in" : "Login"}
-								</button>
-							</div>
-						</form>
-						<div className='mt-4 text-sm text-gray-600 text-center'>
-							<p>
-								{"Don't"} have an account?{" "}
-								<Link to='/signup' className='text-black hover:underline'>
-									Sign Up
-								</Link>
-							</p>
-						</div>
-					</div>
-				</div>
+		<div className="flex justify-center items-center h-screen">
+			<div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8">
+				<h1 className="text-2xl font-bold text-gray-800 text-center mb-4">
+					Welcome Back
+				</h1>
+				<p className="text-sm text-gray-500 text-center mb-6">
+					Log in to your account
+				</p>
+				<form className="space-y-5" onSubmit={handleSubmit}>
+					<InputField
+						label="Username"
+						id="username"
+						name="username"
+						value={loginData.username}
+						onChange={handleChange}
+					/>
+					<InputField
+						label="Password"
+						id="password"
+						name="password"
+						type="password"
+						value={loginData.password}
+						onChange={handleChange}
+					/>
+					<button
+						type="submit"
+						className="w-full bg-indigo-500 text-white py-3 rounded-lg font-medium hover:bg-indigo-600 focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-all duration-300 disabled:opacity-50"
+						disabled={loading}
+					>
+						{loading ? "Logging in..." : "Log In"}
+					</button>
+				</form>
+				<p className="mt-6 text-sm text-center text-gray-600">
+					Dont have an account?{" "}
+					<Link to="/signup" className="text-indigo-500 font-medium hover:underline">
+						Sign Up
+					</Link>
+				</p>
 			</div>
 		</div>
 	);
 };
+
 export default Login;

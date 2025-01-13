@@ -23,11 +23,13 @@
     "express-session": "^1.18.1",
     "graphql": "^16.10.0",
     "graphql-passport": "^0.6.8",
+    "lucide-react": "^0.471.1",
     "mongoose": "^8.9.2",
     "passport": "^0.7.0",
     "ttag": "^1.8.7"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.9"
   }
 }

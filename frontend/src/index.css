@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add this to your global stylesheet */
+h1:hover {
+  transform: scale(1.05);
+}
+p:hover {
+  color: #00c896;
+}
